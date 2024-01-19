@@ -1,0 +1,39 @@
+version: '3'
+services:
+  frontend:
+    image: frontend
+    build: frontend
+    container_name: frontend
+    volumes:
+      - ./frontend:/var/www/html
+    working_dir: /var/www/html
+    command: yarn dev
+    ports:
+      - 8080:3000
+
+  backend:
+    image: backend
+    build: backend
+    container_name: backend
+    volumes:
+      - ./backend:/app
+    working_dir: /app
+    command: bash -c 'bundle install && bundle exec rails s -p 8000 -b "0.0.0.0"'
+    ports:
+      - 8081:8000
+
+  mysql:
+    image: public.ecr.aws/docker/library/mysql:8.2.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+    volumes:
+      - ./docker/db/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - ./docker/db/mysql_data:/var/lib/mysql
+
+  adminer:
+    image: public.ecr.aws/docker/library/adminer:latest
+    container_name: adminer
+    ports:
+      - 8082:8080
+
